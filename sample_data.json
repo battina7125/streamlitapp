@@ -1,0 +1,19 @@
+{
+    "AEE": [
+        {"header": "AEE Trading Halt", "details": "Details of the trading halt..."},
+        {"header": "AEE Quarterly Report", "details": "Details of the quarterly report..."}
+    ],
+    "REZ": [
+        {"header": "REZ Trading Halt", "details": "Details of the trading halt..."},
+        {"header": "REZ Quarterly Report", "details": "Details of the quarterly report..."}
+    ],
+    "1AE": [
+        {"header": "1AE Announcement", "details": "Details of the announcement..."}
+    ],
+    "1MC": [
+        {"header": "1MC Trading Halt", "details": "Details of the trading halt..."}
+    ],
+    "NRZ": [
+        {"header": "NRZ Financial Statement", "details": "Details of the financial statement..."}
+    ]
+}
