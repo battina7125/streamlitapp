@@ -1,27 +1,40 @@
 import streamlit as st
-import requests
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+from bs4 import BeautifulSoup
 import json
+import time
+
+# Set up ChromeDriver with options
+chrome_options = Options()
+chrome_options.add_argument("--headless")  
+chrome_service = Service('chromedriver.exe')  
+driver = webdriver.Chrome(service=chrome_service, options=chrome_options)
 
 # Ticker symbols
 tickers = ['AEE', 'REZ', '1AE', '1MC', 'NRZ']
 
-# Function to fetch announcements using Requests
+# Function to fetch announcements using Selenium
 def fetch_announcements(ticker):
     url = f"https://www.asx.com.au/asx/1/company/{ticker}/announcements?count=20&market_sensitive=false"
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
-    }
+    driver.get(url)
+    time.sleep(3)  
+    
     try:
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()  # Raise an HTTPError on bad response
-        
-        if 'application/json' in response.headers.get('Content-Type', ''):
-            announcements = response.json().get('data', [])
+        page_source = driver.page_source
+        soup = BeautifulSoup(page_source, 'html.parser')
+        # Find the preformatted JSON data in the page source
+        pre_tag = soup.find('pre')
+        if pre_tag:
+            json_data = pre_tag.text
+            announcements = json.loads(json_data).get('data', [])
             return announcements
         else:
-            st.error(f"Unexpected response for {ticker}: {response.text}")
+            st.error(f"Failed to find JSON for {ticker}")
             return None
-    except requests.exceptions.RequestException as e:
+    except Exception as e:
         st.error(f"Failed to fetch announcements for {ticker}: {str(e)}")
         return None
 
@@ -53,3 +66,5 @@ st.write("Tickers with a Trading Halt:")
 for ticker, announcements in all_announcements.items():
     if announcements and has_trading_halt(announcements):
         st.write(ticker)
+
+driver.quit()  
